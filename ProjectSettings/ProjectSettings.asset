@@ -721,11 +721,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: 0172c654-f523-44f1-b7c2-dfa20893a70f
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: Mission Demolition
+  organizationId: carleyr2005
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 
