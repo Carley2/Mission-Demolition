@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Slingshot : MonoBehaviour
 {
+    public LineRenderer rubberBand;
+    public Transform rubberBandAnchor;
+
     // fields set in the Unity Inspector pane
     [Header("Inscribed")]
     public GameObject projectilePrefab;
@@ -17,11 +20,28 @@ public class Slingshot : MonoBehaviour
     public GameObject projectile;
     public bool aimingMode;
 
-    void Awake(){
+    [Header("Sound")]
+    public AudioSource slingshotSound;
+
+    void Awake() {
         Transform launchPointTrans = transform.Find("LaunchPoint");
         launchPoint = launchPointTrans.gameObject;
-        launchPoint.SetActive( false );
+        launchPoint.SetActive(false);
         launchPos = launchPointTrans.position;
+
+        if (rubberBand == null) {
+            rubberBand = GetComponent<LineRenderer>();
+        }
+
+        if (rubberBandAnchor == null) {
+            rubberBandAnchor = launchPointTrans;
+        }
+
+        if (rubberBand != null) {
+            rubberBand.positionCount = 2;
+            rubberBand.useWorldSpace = true;
+            rubberBand.enabled = false;
+        }
     }
 
     void OnMouseEnter() {
@@ -43,6 +63,10 @@ public class Slingshot : MonoBehaviour
         projectile.transform.position = launchPos;
         // Set it to isKinematic for now
         projectile.GetComponent<Rigidbody>().isKinematic = true;
+
+        if (rubberBand != null) {
+            rubberBand.enabled = true;
+        }
     }
 
     void Update() {
@@ -66,13 +90,32 @@ public class Slingshot : MonoBehaviour
         Vector3 projPos = launchPos + mouseDelta;
         projectile.transform.position = projPos;
 
+        if (rubberBand != null && rubberBandAnchor != null) {
+            rubberBand.SetPosition(0, rubberBandAnchor.position);
+            rubberBand.SetPosition(1, projectile.transform.position);
+        }
+
         if ( Input.GetMouseButtonUp(0) ) {
             // The mouse has been released
+            if (slingshotSound != null) {
+                slingshotSound.Play();
+            }
             aimingMode = false;
+
+            if (rubberBand != null) {
+                rubberBand.enabled = false;
+            }
+
             Rigidbody projRB = projectile.GetComponent<Rigidbody>();
             projRB.isKinematic = false;
             projRB.collisionDetectionMode = CollisionDetectionMode.Continuous;
             projRB.velocity = -mouseDelta * velocityMult;
+            AudioSource flyingSound = projectile.GetComponent<AudioSource>();
+
+            if (flyingSound != null) {
+                flyingSound.Play();
+            }
+            
             FollowCam.SWITCH_VIEW( FollowCam.eView.slingshot );
             FollowCam.POI = projectile;
             Instantiate<GameObject>(projLinePrefab, projectile.transform);

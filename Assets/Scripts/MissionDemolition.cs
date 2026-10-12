@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public enum GameMode {
     idle,
@@ -27,12 +28,19 @@ public class MissionDemolition : MonoBehaviour {
     public GameMode mode = GameMode.idle;
     public string showing = "Show Slingshot";
 
+    [Header("Game Over UI")]
+    public GameObject gameOverPanel;
+
     void Start() {
         S = this;
 
         level = 0;
         shotsTaken = 0;
         levelMax = castles.Length;
+        if (gameOverPanel != null) {
+            gameOverPanel.SetActive(false);
+        }
+
         StartLevel();
     }
 
@@ -74,10 +82,12 @@ public class MissionDemolition : MonoBehaviour {
 
     void NextLevel() {
         level++;
-        if (level == levelMax) {
-            level = 0;
-            shotsTaken =0;
+
+        if (level >= levelMax) {
+            ShowGameOver();
+            return;
         }
+
         StartLevel();
     }
 
@@ -87,5 +97,13 @@ public class MissionDemolition : MonoBehaviour {
 
     static public GameObject GET_CASTLE() {
         return S.castle;
+    }
+
+    public void ShowGameOver() {
+        gameOverPanel.SetActive(true);
+    }
+
+    public void RestartGame() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
